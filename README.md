@@ -6,7 +6,7 @@ Scalable-Starbucks-Order-Processor is a comprehensive Starbucks order processing
 
 ## Demo
 
-You can view a demo of the project [here]([https://demo.link](https://drive.google.com/file/d/1LGM-S3nZ0ZR7s0RKWteDOrqkNRIeJpoP/view?usp=drive_link))
+You can view a demo of the project [here](https://drive.google.com/file/d/1LGM-S3nZ0ZR7s0RKWteDOrqkNRIeJpoP/view?usp=drive_link)
 
 ## Features
 
