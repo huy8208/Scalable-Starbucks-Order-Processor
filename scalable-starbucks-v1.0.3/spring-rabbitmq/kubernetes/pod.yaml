@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: rabbitmq-worker-pod
+  namespace: default
+  labels:
+    name: rabbitmq-worker
+spec:
+  restartPolicy: Always
+  containers:
+  - name: rabbitmq-worker
+    image: huynguyen8208/rabbitmq-worker:latest
+    env:
+    - name: MYSQL_HOST
+      value: "172.17.208.3"
+    - name: MYSQL_USER
+      value: "admin"
+    - name: MYSQL_PASS
+      value: "cmpe172"
+    - name: RABBIT_HOST
+      value: "10.112.6.153"
+    - name: RABBIT_USERNAME
+      value: "guest"
+    - name: RABBIT_PASSWORD
+      value: "guest"
+    ports:
+    - containerPort: 8080 

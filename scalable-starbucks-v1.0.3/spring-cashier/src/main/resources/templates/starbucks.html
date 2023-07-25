@@ -1,0 +1,187 @@
+<html>
+
+<head>
+    <!-- Add Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl7/1L_dstPt3HV5HzF6Gvk/e3B7tGwkf8Fv+da7wf" crossorigin="anonymous">
+
+    <!-- Add Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-cn7l7gDp0eyniUwwAZgrzD06kc/tftFf19TOAs2zVinnD/C7E91j9yyk5//jjpt/"
+        crossorigin="anonymous"></script>
+    <title>Starbucks Reserved</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .custom-container {
+            max-width: 80%;
+            margin: 0 auto;
+        }
+
+        .drink-image {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .drink-image:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-primary {
+            background-color: #4CAF50;
+            border-color: #4CAF50;
+        }
+
+        .btn-primary:hover {
+            background-color: #3a8d40;
+            border-color: #3a8d40;
+        }
+    </style>
+
+
+
+
+</head>
+
+<body onload="selectedStore()">
+    <div class="container custom-container">
+        <h1 class="text-center mt-5">Welcome to Starbucks Reserved (Midterm 2023)</h1>
+
+        <!-- FORM SECTION -->
+
+        <form name="form" th:object="${command}" method="post" action="/starbucks">
+
+            <input type="hidden" name="register" id="register" th:field="*{register}" />
+
+            <p>
+            <div align="center">
+                <textarea readonly id="message" name="message" cols="50" rows="13" th:text="${message}" />
+            </div>
+            </p>
+            <!-- Drinks menu -->
+            <h3 align="center">Customize your drink</h3>
+            <div align="center">
+                <label for="drink">Drink:</label>
+                <select name="drink" id="drink" th:field="*{drink}">
+                    <option th:each="drink : ${drinks}" th:value="${drink}" th:text="${drink}"></option>
+                </select>
+                <br /><br />
+                <label for="size">Size:</label>
+                <select name="size" id="size" th:field="*{size}">
+                    <option th:each="size : ${sizes}" th:value="${size}" th:text="${size}"></option>
+                </select>
+                <br /><br />
+                <label for="milk">Milk:</label>
+                <select name="milk" id="milk" th:field="*{milk}">
+                    <option th:each="milk : ${milks}" th:value="${milk}" th:text="${milk}"></option>
+                </select>
+            </div>
+            <br />
+
+
+
+            <br />
+
+            <div align="center">
+                <label for="stores">Select Store:</label>
+                <select name="stores" id="stores">
+                    <option value="5012349">Dub-C</option>
+                    <option value="1287612">P-Town</option>
+                    <option value="6498234">The City</option>
+                    <option value="7812386">Eso</option>
+                    <option value="8723098">The Dro</option>
+                    <option value="9621043">Mateo</option>
+                    <option value="1393478">Deadwood</option>
+                </select>
+            </div>
+
+            <br />
+
+            <p align="center"><img src="/images/starbucks.jpg"></p>
+
+            <br />
+
+            <p align="center">
+                <input type="submit" name="action" id="btnGetOrder" value="Get Order">
+
+                <input type="submit" name="action" id="btnPlaceOrder" value="Place Order">
+
+                <input type="submit" name="action" id="btnClearOrder" value="Clear Order">
+
+            </p>
+
+        </form>
+
+        <div sec:authorize="isAuthenticated()" align="center">
+            <p>Logged as: <span sec:authentication="name"></span></p>
+            <p>Has role: <span sec:authentication="authorities"></span></p>
+            <a th:href="@{/logout}">Log out</a>
+        </div>
+
+        <!-- END FORM SECTION -->
+    </div>
+
+    <script type="text/javascript">
+        function selectedStore() {
+            reg = document.getElementById("register").value
+            switch (reg) {
+                case "5012349":
+                    document.getElementById("stores").options[0].selected = true
+                    break;
+                case "1287612":
+                    document.getElementById("stores").options[1].selected = true
+                    break;
+                case "6498234":
+                    document.getElementById("stores").options[2].selected = true
+                    break;
+                case "7812386":
+                    document.getElementById("stores").options[3].selected = true
+                    break;
+                case "8723098":
+                    document.getElementById("stores").options[4].selected = true
+                    break;
+                case "9621043":
+                    document.getElementById("stores").options[5].selected = true
+                    break;
+                case "1393478":
+                    document.getElementById("stores").options[6].selected = true
+                    break;
+                default:
+                    document.getElementById("stores").options[0].selected = true
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.getElementById('drink').addEventListener('change', function () {
+                var sizesDropdown = document.getElementById('size');
+                while (sizesDropdown.firstChild) {
+                    sizesDropdown.removeChild(sizesDropdown.firstChild);
+                }
+                if (this.value === 'Espresso') {
+                    var sizes = ['Short', 'Tall'];
+                } else {
+                    var sizes = ['Tall', 'Grande', 'Venti', 'Your Own Cup'];
+                }
+                for (var i = 0; i < sizes.length; i++) {
+                    var option = document.createElement('option');
+                    option.text = sizes[i];
+                    option.value = sizes[i];
+                    sizesDropdown.add(option);
+                }
+            });
+        });
+
+
+
+    </script>
+
+</body>
+
+
+</html>

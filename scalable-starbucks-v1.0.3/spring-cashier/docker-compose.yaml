@@ -1,0 +1,129 @@
+
+version: "3"
+
+services:
+  mysql:
+    image: mysql:8.0
+    platform: linux/amd64
+    volumes:
+      - /tmp:/tmp
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3306:3306"
+    networks:
+      - kong-network
+    environment:
+      MYSQL_ROOT_PASSWORD: "cmpe172"
+    restart: always     
+  starbucks:
+    image: spring-starbucks-api
+    platform: linux/amd64
+    depends_on:
+    - mysql    
+    volumes:
+      - /tmp:/tmp
+    networks:
+      - kong-network   
+    ports:
+      - 8080  #External:Internal of starbucks
+    environment:
+      MYSQL_HOST: "mysql"
+      MYSQL_USER: "firstuser"
+      MYSQL_PASS: "hello"
+    restart: always
+  spring-cashier:
+    image: spring-cashier
+    platform: linux/amd64
+    volumes:
+      - /tmp:/tmp
+    networks:
+      - kong-network
+    depends_on:
+      - mysql
+      - kong
+    ports:
+      - 9090
+    environment:
+      MYSQL_HOST: "mysql"
+      MYSQL_USER: "admin"
+      MYSQL_PASS: "cmpe172"
+      API_HOST: "kong:8000/api"
+      API_KEY: "2H3fONTa8ugl1IcVS7CjLPnPIS2Hp9dJ"
+      API_ENDPOINT: "http://kong:8000"
+    restart: always 
+  spring-cashier-lb:
+    image: eeacms/haproxy
+    platform: linux/amd64
+    depends_on:
+    - spring-cashier
+    ports:
+    - "91:5000"
+    - "1937:1937"
+    environment:
+      BACKENDS: "spring-cashier"
+      BACKENDS_PORT: "9090" #Spring-cashier internal port.
+      DNS_ENABLED: "true"
+      COOKIES_ENABLED: "false"
+      LOG_LEVEL: "info"
+      STATS_PORT: "1937"
+      STATS_AUTH: "admin:admin"
+    networks:
+      - kong-network
+  starbucks-service-lb:
+    image: eeacms/haproxy
+    platform: linux/amd64
+    depends_on:
+    - starbucks
+    ports:
+    - "90:5000"
+    - "1936:1936"
+    environment:
+      HTTPCHK: "GET /ping"
+      BACKENDS: "starbucks"
+      BACKENDS_PORT: "8080" #starbucks internal port.
+      DNS_ENABLED: "true"
+      COOKIES_ENABLED: "false"
+      LOG_LEVEL: "info"
+    networks:
+      - kong-network
+  kong:
+    image: kong:2.4.0
+    platform: linux/amd64
+    depends_on:
+      - starbucks-service-lb
+    networks:
+      - kong-network
+    restart:
+      always
+    ports:
+      - "80:8000"
+      - "443:8443"
+      - "8001:8001"
+      - "8444:8444"
+    environment:
+      KONG_DATABASE: "off"
+      KONG_PROXY_ACCESS_LOG: "/dev/stdout" 
+      KONG_ADMIN_ACCESS_LOG: "/dev/stdout"
+      KONG_PROXY_ERROR_LOG: "/dev/stderr" 
+      KONG_ADMIN_ERROR_LOG: "/dev/stderr"
+      KONG_ADMIN_LISTEN: "0.0.0.0:8001, 0.0.0.0:8444 ssl"
+      KONG_DECLARATIVE_CONFIG: "/kong.yaml"
+    volumes:
+      - "./kong.yaml:/kong.yaml"  # <-- Add this line to mount the configuration file as a volume
+  jumpbox:
+    image: ubuntu
+    platform: linux/amd64
+    networks:
+      - kong-network     
+    restart: always  
+    entrypoint:
+      - "sleep"
+      - "3600"
+volumes:
+  schemas:
+    external: false
+
+networks:
+  kong-network:
+    driver: bridge
+
