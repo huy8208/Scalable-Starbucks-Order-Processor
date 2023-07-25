@@ -26,3 +26,4 @@ You can view a demo of the project [here]([https://demo.link](https://drive.goog
 
 ## Architecture Diagram
 
+[![Architecture Diagram](https://github.com/huy8208/Scalable-Starbucks-Order-Processor/blob/main/diagram/archiecture-diagram.png)](https://github.com/huy8208/
