@@ -17,6 +17,7 @@ The Scalable-Starbucks-Order-Processor is a project that emulates a comprehensiv
 - RabbitMQ
 - Kong API Gateway
 - Java
+- Kubernetes
 
 ## Features
 
